@@ -1,2 +1,5 @@
 # flash-pandas
-Web app to help people recall and or learn Data Science programming
+
+Web app to help people recall and or learn Data Science programming.
+
+[Trello Board](https://trello.com/b/iuCiTkL5)
