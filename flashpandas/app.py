@@ -1,39 +1,132 @@
 from os import getenv
-from string import ascii_lowercase
+
 import dash
-import sqlite3
-from flask_sqlalchemy import SQLAlchemy
-from dash.dependencies import Output, State, Input
 import dash_bootstrap_components as dbc
+from dash_bootstrap_components._components.Button import Button
+from dash_bootstrap_components._components.NavLink import NavLink
 import dash_core_components as dcc
 import dash_html_components as html
-from .pages import home, learn
+from dash.dependencies import Output, State, Input
+from flask_sqlalchemy import SQLAlchemy
+
+
+
+from .pages import home, learn, test
 from pprint import pprint
 
 pages = {
-    'home': '',
-    'learn': 'learn'
+    'learn': {
+        'url': '/learn', 
+        'button': {
+            'color': 'warning',
+            'outline': True,
+            'style': {
+                'margin-right': '1%'}
+            },
+    },
+    'home': {
+        'url': '/', 
+        'button': {
+            'color': 'success',
+            'outline': True,
+            'style': {
+                'margin-right': '1%'}
+            }, 
+    },
+    'test': {
+        'url': '/test', 
+        'button': {
+            'color': 'primary',
+            'outline': True,
+            'style': {
+                'margin-right': '1%'}
+            },
+    }
 }
 
-def create_app():
-    app = dash.Dash(__name__)
+my_blue = '#C8E4F4'
 
+def create_app():
+    app = dash.Dash(__name__, 
+        external_stylesheets=[
+            dbc.themes.LUMEN, 
+            'https://use.fontawesome.com/releases/v5.9.0/css/all.css'
+        ]
+    )
+
+    app.config.suppress_callback_exceptions = True
+    app.title = 'Flash Pandas'
     # app.config['DATABASE_URI'] = getenv('DATABASE_URI')
     # DB = SQLAlchemy(app)
 
     url = dcc.Location(id='url')
 
-    navbar = dbc.Navbar([
-        dcc.Link(dbc.Button(f"{page.capitalize()}", id=f"{page}"), href=f"/{url}") for page, url in pages.items()
-    ], id='nav', style={'text-align': 'center'})
+    navbar = \
+        dbc.Navbar(
+            dbc.Row(
+                [
+                    dbc.NavLink(
+                        dbc.Button(
+                            children=f"{name.capitalize()}", 
+                            id=f"{name}",
+                            color=info['button']['color'],
+                            outline=info['button']['outline'],
+                            # style=info['button']['style'],
+                        ),
+                        href=info['url'],
+                        style={'margin': '0px', 'padding': '5px'}
+                    ) 
+                    for name, info in pages.items()
+                ], 
+                style={'margin': 'auto'}
+            ), 
+            id='nav',
+        )
 
-    page = html.Div(id='page-content')
+    page = html.Div(id='page-content', style={'margin': '1rem'})
 
-    app.layout = html.Div([
-        url,
-        navbar,
-        page
-    ])
+    footer = \
+        html.Div(
+            [
+                html.A(
+                    dbc.Button(
+                        "YouTube",
+                        id='youtube',
+                        color='danger',
+                        outline=True,
+                        size='sm'
+                    ),
+                    href="https://youtube.com/MaxTechniche",
+                    style={'margin': '1%'}
+                ),
+                html.A(
+                    dbc.Button(
+                        "GitHub",
+                        id='github',
+                        color='dark',
+                        outline=True,
+                        size='sm'
+                    ),
+                    href="https://github.com/MaxTechniche",
+                    style={'margin': '1%'}
+                ),
+            ], 
+            style={'text-align': 'center'}
+        )
+
+    app.layout = dbc.Container(
+        [
+            url,
+            navbar,
+            page,
+            footer
+        ], 
+        style={
+            'word-wrap': 'break-word', 
+            'position': 'relative', 
+            'min-height': '95vh'
+        }
+    )
 
 
 
@@ -41,9 +134,9 @@ def create_app():
                   Input('url', 'pathname'))
     def get_page(pathname):
         if pathname == '/':
-            return home.url
+            return home.layout
         try:
-            return globals()[f"{ pathname.replace('/', '') }"].url
+            return globals()[f"{ pathname.replace('/', '') }"].layout
         except KeyError:
             return 'Path not found.'
 
