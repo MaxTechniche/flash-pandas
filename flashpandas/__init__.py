@@ -1,6 +1,6 @@
 
 from .app import create_app
-from .pages import home, learn, test
+from .pages import home, learn, test, login, signup
 
 
 from pprint import pprint
@@ -12,38 +12,32 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Output, State, Input
 
-from .dbmodels import DB, User
+# from .dbmodels import DB, User
 
 app = create_app()
 server = app.server
 
-pages = {
+page_names = {
     'learn': {
         'url': '/learn', 
         'button': {
             'color': 'warning',
             'outline': True,
-            'style': {
-                'margin-right': '1%'}
-            },
+        }
     },
     'home': {
         'url': '/', 
         'button': {
             'color': 'success',
             'outline': True,
-            'style': {
-                'margin-right': '1%'}
-            }, 
+        }
     },
     'test': {
         'url': '/test', 
         'button': {
             'color': 'primary',
             'outline': True,
-            'style': {
-                'margin-right': '1%'}
-            },
+        }
     }
 }
 
@@ -53,22 +47,47 @@ url = dcc.Location(id='url')
 
 navbar = \
     dbc.Navbar(
-        dbc.Row(
-            [
-                dbc.NavLink(
-                    dbc.Button(
-                        children=f"{name.capitalize()}", 
-                        id=f"{name}",
-                        color=info['button']['color'],
-                        outline=info['button']['outline'],
-                    ),
-                    href=info['url'],
-                    style={'margin': '0px', 'padding': '5px'}
-                ) 
-                for name, info in pages.items()
-            ], 
-            style={'margin': 'auto'}
-        ), 
+        [
+            dbc.Row(
+                [
+                    dbc.NavLink(
+                        dbc.Button(
+                            children=f"{name.capitalize()}", 
+                            id=f"{name}",
+                            color=info['button']['color'],
+                            outline=info['button']['outline'],
+                            active=True
+                        ),
+                        href=info['url'],
+                        style={'margin': '0px', 'padding': '5px'}
+                    ) 
+                    for name, info in page_names.items()
+                ], 
+                style={'margin': 'auto'}
+            ),
+            # dbc.Row(
+            #     [
+            #         dbc.NavLink(
+            #             dbc.Button(
+            #                 children="Login",
+            #                 id='login',
+            #                 color='info',
+            #                 outline=True
+            #             ),
+            #             href='/login',
+            #         ),
+            #         dbc.NavLink(
+            #             dbc.Button(
+            #                 children="Sign Up",
+            #                 id='signup',
+            #                 color='link',
+            #                 outline=True
+            #             ),
+            #             href='/signup'
+            #         )
+            #     ]
+            # )
+        ], 
         id='nav',
     )
 
@@ -118,15 +137,21 @@ app.layout = dbc.Container(
 )
 
 
-@app.callback(Output('page-content', 'children'),
-                Input('url', 'pathname'))
+@app.callback([
+    Output('page-content', 'children')] + [
+    Output(page_name, 'active') for page_name in page_names],
+    Input('url', 'pathname'))
 def display_page(pathname):
-    DB.drop_all()
-    DB.create_all()
+    # DB.drop_all()
+    # DB.create_all()
+    path_actives = {name: False for name in page_names}
     if pathname == '/':
-        return home.layout
+        path_actives['home'] = True
+        return [home.layout] + list(path_actives.values())
+
     try:
-        return globals()[f"{ pathname.replace('/', '') }"].layout
+        path_actives[f"{ pathname.replace('/', '') }"] = True
+        return [globals()[f"{ pathname.replace('/', '') }"].layout] + list(path_actives.values())
     except KeyError:
         return 'Path not found.'
 
