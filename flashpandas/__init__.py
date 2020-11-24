@@ -12,7 +12,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Output, State, Input
 
-# from .dbmodels import DB, User
+from .dbmodels import DB, User
 
 app = create_app()
 server = app.server
@@ -148,8 +148,8 @@ app.layout = dbc.Container(
     Output(page_name, 'active') for page_name in page_names],
     Input('url', 'pathname'))
 def display_page(pathname):
-    # DB.drop_all()
-    # DB.create_all()
+    DB.drop_all()
+    DB.create_all()
     path_actives = {name: False for name in page_names}
     if pathname == '/':
         path_actives['home'] = True
