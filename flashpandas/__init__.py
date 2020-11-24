@@ -56,7 +56,7 @@ navbar = \
                             id=f"{name}",
                             color=info['button']['color'],
                             outline=info['button']['outline'],
-                            active=True
+                            active=False
                         ),
                         href=info['url'],
                         style={'margin': '0px', 'padding': '5px'}
@@ -94,32 +94,38 @@ navbar = \
 page = html.Div(id='page-content', style={'margin': '1rem'})
 
 footer = \
-    html.Div(
+    dbc.Col(
         [
-            html.A(
-                dbc.Button(
-                    "YouTube",
-                    id='youtube',
-                    color='danger',
-                    outline=True,
-                    size='sm'
-                ),
-                href="https://youtube.com/MaxTechniche",
-                style={'margin': '1%'}
-            ),
-            html.A(
-                dbc.Button(
-                    "GitHub",
-                    id='github',
-                    color='dark',
-                    outline=True,
-                    size='sm'
-                ),
-                href="https://github.com/MaxTechniche",
-                style={'margin': '1%'}
-            ),
-        ], 
-        style={'text-align': 'center'}
+            "Built by Jacob Maxfield with Dash.",
+            html.Div(
+                [
+                    html.A(
+                        dbc.Button(
+                            "YouTube",
+                            id='youtube',
+                            color='danger',
+                            outline=True,
+                            size='sm'
+                        ),
+                        href="https://youtube.com/MaxTechniche",
+                        style={'margin': '1%'}
+                    ),
+                    html.A(
+                        dbc.Button(
+                            "GitHub",
+                            id='github',
+                            color='dark',
+                            outline=True,
+                            size='sm'
+                        ),
+                        href="https://github.com/MaxTechniche",
+                        style={'margin': '1%'}
+                    ),
+                ],
+                style={'margin-top': '5px'}
+            )
+        ],
+        style={'text-align': 'center', 'margin-bottom': '15px'}
     )
 
 app.layout = dbc.Container(
