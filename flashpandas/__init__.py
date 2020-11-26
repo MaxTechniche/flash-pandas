@@ -1,95 +1,80 @@
 
-from .app import create_app
-from .pages import home, learn, test, login, signup
+from .app import APP, users, questions
+from .pages import home, learn, test, login, signup, search, create
 
 
 from pprint import pprint
 
 import dash_bootstrap_components as dbc
-from dash_bootstrap_components._components.Button import Button
-from dash_bootstrap_components._components.NavLink import NavLink
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Output, State, Input
 
 # Use in future when you have access to larger SQL storage
-from .dbmodels import DB
+# from .dbmodels import DB, users, questions
 
-app = create_app()
+app = APP
 server = app.server
 
 page_names = {
+    'create': {
+        'url': '/create',
+        'color': 'purple'
+    },
+    'search': {
+        'url': '/search',
+        'color': 'yellow'
+    },
     'learn': {
-        'url': '/learn', 
-        'button': {
-            'color': 'warning',
-            'outline': True,
-        }
+        'url': '/learn',
+        'color': 'warning'
     },
     'home': {
-        'url': '/', 
-        'button': {
-            'color': 'success',
-            'outline': True,
-        }
+        'url': '/',
+        'color': 'success'
     },
     'test': {
-        'url': '/test', 
-        'button': {
-            'color': 'primary',
-            'outline': True,
-        }
+        'url': '/test',
+        'color': 'primary'
+    },
+    'login': {
+        'url': '/login',
+        'color': 'info'
+    },
+    'signup': {
+        'url': '/signup',
+        'color': 'dark'
     }
 }
 
+
 my_blue = '#C8E4F4'
+
+user_details = html.Div(id='user-details', style={'display': 'none'})
 
 url = dcc.Location(id='url')
 
 navbar = \
     dbc.Navbar(
-        [
-            dbc.Row(
-                [
-                    dbc.NavLink(
-                        dbc.Button(
-                            children=f"{name.capitalize()}", 
-                            id=f"{name}",
-                            color=info['button']['color'],
-                            outline=info['button']['outline'],
-                            active=False
-                        ),
-                        href=info['url'],
-                        style={'margin': '0px', 'padding': '5px'}
-                    ) 
-                    for name, info in page_names.items()
-                ], 
-                style={'margin': 'auto'}
-            ),
-            # dbc.Row(
-            #     [
-            #         dbc.NavLink(
-            #             dbc.Button(
-            #                 children="Login",
-            #                 id='login',
-            #                 color='info',
-            #                 outline=True
-            #             ),
-            #             href='/login',
-            #         ),
-            #         dbc.NavLink(
-            #             dbc.Button(
-            #                 children="Sign Up",
-            #                 id='signup',
-            #                 color='link',
-            #                 outline=True
-            #             ),
-            #             href='/signup'
-            #         )
-            #     ]
-            # )
-        ], 
+        dbc.Row(
+            [
+                dbc.NavLink(
+                    dbc.Button(
+                        children=name.capitalize(),
+                        id=name,
+                        color=info['color'],
+                        outline=True,
+                        active=False,
+                    ),
+                    href=info['url'],
+                    style={'padding': '5px'}
+                )
+                for name, info in page_names.items()
+            ],
+            style={'margin': 'auto'}
+        ), 
         id='nav',
+        style={'padding': '0px'}
     )
 
 page = html.Div(id='page-content', style={'margin': '1rem'})
@@ -131,6 +116,7 @@ footer = \
 
 app.layout = dbc.Container(
     [
+        user_details,
         url,
         navbar,
         page,
@@ -145,10 +131,11 @@ app.layout = dbc.Container(
 
 
 @app.callback([
-    Output('page-content', 'children')] + [
-    Output(page_name, 'active') for page_name in page_names],
-    Input('url', 'pathname'))
-def display_page(pathname):
+    Output('page-content', 'children')] + [Output(page_name, 'active') for page_name in page_names],
+    [Input('url', 'pathname'),
+    State('user-details', 'children')])
+def display_page(pathname, user):
+    print(user)
     path_actives = {name: False for name in page_names}
     if pathname == '/':
         path_actives['home'] = True
@@ -160,3 +147,10 @@ def display_page(pathname):
     except KeyError:
         return 'Path not found.'
 
+# @app.callback(
+#     Output('user-details', 'children'),
+#     Input('user-details', 'children')
+# )
+# def print_user(user):
+#     print(user)
+#     return user

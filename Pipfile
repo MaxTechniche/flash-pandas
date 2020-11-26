@@ -8,7 +8,6 @@ verify_ssl = true
 [packages]
 pandas = "*"
 numpy = "*"
-python-dotenv = "*"
 sklearn = "*"
 psycopg2-binary = "*"
 psycopg2 = "*"
@@ -23,6 +22,7 @@ dash-html-components = "*"
 dnspython = "*"
 flask-pymongo = "*"
 bson = "*"
+python-dotenv = "*"
 
 [requires]
 python_version = "3.8"

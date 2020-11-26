@@ -4,35 +4,35 @@ import dash
 import dash_bootstrap_components as dbc
 
 from .dbmodels import DB
-from dotenv import load_dotenv
-load_dotenv()
+from pymongo import MongoClient
 
 
-def create_app():
-    app = dash.Dash(__name__, 
-        external_stylesheets=[
-            dbc.themes.LUMEN, 
-            'https://use.fontawesome.com/releases/v5.9.0/css/all.css'
-        ]
-    )
+# def create_APP():
+APP = dash.Dash(__name__, 
+    external_stylesheets=[
+        dbc.themes.LUMEN, 
+        'https://use.fontawesome.com/releases/v5.9.0/css/all.css',
+    ], 
+)
 
-    app.title = 'Flash Pandas'
+APP.title = 'Flash Pandas'
 
-    # SQLAlchemy
-    # app.server.config.suppress_callback_exceptions = True
-    # app.server.config["SQLALCHEMY_DATABASE_URI"] = 'postgres://oaymqsay:UJeG8QPe0kUGEpTKGMllsZDzPEdeBxCl@suleiman.db.elephantsql.com:5432/oaymqsay'
-    # app.server.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    
-    # MongoAlchemy 
-    app.server.config['MONGOALCHEMY_SERVER_AUTH'] = False
+# SQLAlchemy
+APP.server.config.suppress_callback_exceptions = True
+# APP.server.config["SQLALCHEMY_DATABASE_URI"] = 
+# APP.server.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-    mongo_db = getenv('MONGO_DB_URI')
-    print(mongo_db)
+# MongoAlchemy 
+# APP.server.config['MONGOALCHEMY_SERVER_AUTH'] = False
 
-    app.server.config['MONGO_URI'] = \
-                getenv('MONGO_DB_URI')
+mongo_db = getenv('MONGO_DB_URI')
 
-    DB.init_app(app.server)
+APP.server.config['MONGO_URI'] = mongo_db
+
+DB.init_app(APP.server)
+
+users = DB.db.users
+questions = DB.db.questions
 
 
-    return app
+    # return APP

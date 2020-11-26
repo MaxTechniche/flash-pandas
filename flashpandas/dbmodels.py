@@ -25,12 +25,10 @@
 #         secondary=association_table,
 #         back_populates="contributions"
 #     )
-
-
+# from pymongo import MongoClient
 from flask_pymongo import PyMongo
+
 DB = PyMongo()
-
-
 # class User(DB.Document):
 #     id = DB.Column(DB.Integer, primary_key=True)
 #     username = DB.Column(DB.VARCHAR(20), primary_key=True, nullable=False, unique=True)
