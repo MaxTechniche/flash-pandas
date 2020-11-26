@@ -27,6 +27,8 @@ APP.server.config.suppress_callback_exceptions = True
 
 mongo_db = getenv('MONGO_DB_URI')
 
+APP.server.secret_key = getenv('SECRET_KEY')
+
 APP.server.config['MONGO_URI'] = mongo_db
 
 DB.init_app(APP.server)

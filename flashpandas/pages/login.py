@@ -1,13 +1,16 @@
+from bcrypt import checkpw
+
 import dash_bootstrap_components as dbc
-from dash_bootstrap_components._components.Checkbox import Checkbox
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Output, State, Input
+from flask import session
 
 from flashpandas.app import APP, users, questions
 
+url = dcc.Location(id='url', pathname='/login')
 
-layout = \
+logged_out_layout = \
     dbc.Row(
         dbc.Col(
             [
@@ -42,6 +45,26 @@ layout = \
         style={'text-alignment': 'center'}
     )
 
+logged_in_layout = \
+    dbc.Col(
+        [
+            dbc.Label("Already logged in", id='logged-in-label'),
+            dbc.Button("Log Out", id='log-out')
+        ]
+    )
+
+
+@APP.callback(
+    Output('url', 'pathname'),
+    Input('log-out', 'n_clicks')
+)
+def log_out(n_clicks):
+    if n_clicks:
+        session.pop('username', None)
+        return '/'
+    else:
+        return '/login'
+
 @APP.callback(
     Output('password-entry', 'type'),
     Input('pass-toggle', 'checked')
@@ -53,8 +76,7 @@ def toggle_password_visibility(checked):
         return 'password'
 
 @APP.callback(
-    [Output('info-label', 'children'),
-    Output('user-details', 'children')],
+    Output('info-label', 'children'),
     Input('login-button', 'n_clicks'),
     [State('username-entry', 'value'),
     State('password-entry', 'value')]
@@ -62,8 +84,16 @@ def toggle_password_visibility(checked):
 def check_login(login_click, username, password):
     if login_click:
         if not username or not password:
-            return 'user credentials not entered', None
-        else:
-            # user_info = users.find_one()
-            return dcc.Location(pathname='/', id='login-successful'), 'Logged in'
-    return '', None
+            return 'user credentials not entered'
+        
+        user_info = users.find_one({'username': username})
+
+        if not user_info:
+            return 'User not found'
+
+        if not checkpw(bytes(password, 'utf-8'), user_info['password']):
+            return 'username or password incorrect'
+
+        session['username'] = username
+        return dcc.Location(pathname='/', id='login-successful')
+    return ''
