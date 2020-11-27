@@ -1,84 +1,18 @@
-
-from flask.globals import current_app
-from .app import APP, users, questions
-from .pages import home, learn, test, login, signup, search, create, signout, account
-
-
-from pprint import pprint
-
-from flask import session
+import time
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
+from flask import session
 from dash.dependencies import Output, State, Input
+from .app import APP, users, cards
+from .pages import (
+    home, learn, test, 
+    login, signup, search, 
+    create, signout, profile)
 
-# Use in future when you have access to larger SQL storage
-# from .dbmodels import DB, users, questions
 
 app = APP
 server = app.server
-
-logged_in_pages = {
-    'create': {
-        'url': '/create',
-        'color': 'purple'
-    },
-    'search': {
-        'url': '/search',
-        'color': 'yellow'
-    },
-    'learn': {
-        'url': '/learn',
-        'color': 'warning'
-    },
-    'home': {
-        'url': '/',
-        'color': 'success'
-    },
-    'test': {
-        'url': '/test',
-        'color': 'primary'
-    },
-    'account': {
-        'url': '/account',
-        'color': 'info'
-    },
-    'signout': {
-        'url': '/signout',
-        'color': 'dark'
-    }
-}
-
-logged_out_pages = {
-    'create': {
-        'url': '/create',
-        'color': 'purple'
-    },
-    'search': {
-        'url': '/search',
-        'color': 'yellow'
-    },
-    'learn': {
-        'url': '/learn',
-        'color': 'warning'
-    },
-    'home': {
-        'url': '/',
-        'color': 'success'
-    },
-    'test': {
-        'url': '/test',
-        'color': 'primary'
-    },
-    'login': {
-        'url': '/login',
-        'color': 'info'
-    },
-    'signup': {
-        'url': '/signup',
-        'color': 'dark'
-    }
-}
 
 my_blue = '#C8E4F4'
 
@@ -87,53 +21,24 @@ user_details = html.Div(id='user-details', style={'display': 'none'})
 url = dcc.Location(id='url')
 
 
-
-logged_in_navbar = \
-    dbc.Row(
-        [
-            dbc.NavLink(
-                dbc.Button(
-                    children=name.capitalize(),
-                    id=name,
-                    color=info['color'],
-                    outline=True,
-                    active=False,
-                ),
-                href=info['url'],
-                style={'padding': '5px'}
-            )
-            for name, info in logged_in_pages.items()
-        ],
-        style={'margin': 'auto'}
-    )
-
-
-logged_out_navbar = \
-    dbc.Row(
-        [        
-            dbc.NavLink(
-                dbc.Button(
-                    children=name.capitalize(),
-                    id=name,
-                    color=info['color'],
-                    outline=True,
-                    active=False,
-                ),
-                href=info['url'],
-                style={'padding': '5px'}
-            )
-            for name, info in logged_out_pages.items()
-        ],
-        style={'margin': 'auto'}
-    )
-    
-
-navbar = \
-    dbc.Navbar(
-        children=logged_out_navbar,
-        id='nav',
-        style={'padding': '0px'}
-    )
+navbar = dbc.NavbarSimple(
+    children=[
+        dbc.NavLink('Learn', href='/learn'),
+        dbc.NavLink('Test', href='/test'),
+        dbc.NavLink('Create', href='/create', disabled=True, id='create-link'),
+        dbc.DropdownMenu(
+            children=[
+                dbc.DropdownMenuItem('Login', href='/login'),
+                dbc.DropdownMenuItem('Create Account', href='/signup')
+            ], 
+            id='account-dropdown', 
+            label='Account', 
+            nav=True,
+        )
+    ],
+    brand='Flash-Pandas',
+    brand_href='/',
+)
 
 
 page = html.Div(id='page-content', style={'margin': '1rem'})
@@ -190,81 +95,65 @@ app.layout = dbc.Container(
 
 
 @app.callback([
-    Output('nav', 'children'), 
+    Output('create-link', 'disabled'),
+    Output('account-dropdown', 'children'),
     Output('page-content', 'children')],
     Input('url', 'pathname'))
 def display_page(pathname):
-    # print(session.get('username', None))
-    if session.get('username', None):
-        path_actives = {name: False for name in logged_in_pages}
-        current_pages = logged_in_pages
-    else:
-        path_actives = {name: False for name in logged_out_pages}
-        current_pages = logged_out_pages
 
-
+    n_layout = None
 
     if pathname == '/':
-        path_actives['home'] = True
-        current_nav = get_nav(current_pages, path_actives)
-        return [current_nav] + [home.layout]
+        n_layout = [home.layout]
 
     if pathname == '/login':
-        path_actives['login'] = True
-        current_nav = get_nav(current_pages, path_actives)
         if session.get('username', None):
-            return [current_nav] + [login.logged_in_layout]
+            n_layout = [login.logged_in_layout]
         else:
-            return [current_nav] + [login.logged_out_layout]
-
+            n_layout = [login.logged_out_layout]
 
     if pathname == '/signup':
-        path_actives["signup"] = True
-        current_nav = get_nav(current_pages, path_actives)
-        return [current_nav] + [signup.layout]
-
+        n_layout = [signup.layout]
 
     if pathname in ['/signout', '/logout']:
         session.pop('username', None)
-        path_actives['signout'] = True
-        current_nav = get_nav(current_pages, path_actives)
-        return [current_nav] + [signout.layout]
+        time.sleep(1)
+        n_layout = [home.layout]
+
+    if pathname == '/create':
+        if not session.get('username', None):
+            n_layout = [create.logged_out_layout]
+        else:
+            n_layout = [create.layout]
+
+    if not n_layout:
+        try:
+            n_layout = [globals()[f"{ pathname.replace('/', '') }"].layout]
+        except KeyError:
+            n_layout = html.Div('Path not found.', style={'text-align': 'center'})
+
+    c_link = get_create_link()
+    a_drop = get_account_dropdown()
+    
+    return [c_link, a_drop, n_layout]
 
 
-    try:
-        path_actives[f"{ pathname.replace('/', '') }"] = True
-        current_nav = get_nav(current_pages, path_actives)
-        return [current_nav] + [globals()[f"{ pathname.replace('/', '') }"].layout]
-    except KeyError:
-        current_nav = get_nav(current_pages, path_actives)
-        return [current_nav] + 'Path not found.'
+def get_create_link():
+    if session.get('username', None):
+        return False
+    return True
 
+def get_account_dropdown():
+    if session.get('username', None):
+        return [
+            dbc.DropdownMenuItem('Profile', href='/profile'),
+            dbc.DropdownMenuItem('Sign Out', href='/signout')
+        ]
+    else:
+        return [
+            dbc.DropdownMenuItem('Login', href='/login'),
+            dbc.DropdownMenuItem('Create Account', href='/signup')
+        ]
 
-def get_nav(pages, paths):
-
-    return dbc.Row(
-        [        
-            dbc.NavLink(
-                dbc.Button(
-                    children=name.capitalize(),
-                    id=name,
-                    color=info['color'],
-                    outline=True,
-                    active=paths[name],
-                ),
-                href=info['url'],
-                style={'padding': '5px'}
-            )
-            for name, info in pages.items()
-        ],
-        style={'margin': 'auto'}
-    )
-
-
-# @app.callback(
-#     Output('user-details', 'children'),
-#     Input('user-details', 'children')
-# )
-# def print_user(user):
-#     print(user)
-#     return user
+def get_page_content():
+    pass

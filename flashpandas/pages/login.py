@@ -1,17 +1,21 @@
 from bcrypt import checkpw
+import re
+import time
 
 import dash_bootstrap_components as dbc
+from dash_bootstrap_components._components.Label import Label
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Output, State, Input
 from flask import session
 
-from flashpandas.app import APP, users, questions
+from flashpandas.app import APP, users, cards
 
 url = dcc.Location(id='url', pathname='/login')
 
 logged_out_layout = \
-    dbc.Row(
+    html.Div([
+        html.Div("Login", style={'text-align': 'center', 'font-size': '20px'}),
         dbc.Col(
             [
                 dbc.Label('Username', id='user-label'),
@@ -41,16 +45,18 @@ logged_out_layout = \
                     style={'margin-left': '10px'}
                 )
             ]
-        ),
+        ),],
         style={'text-alignment': 'center'}
+
     )
 
 logged_in_layout = \
-    dbc.Col(
+    html.Div(
         [
             dbc.Label("Already logged in", id='logged-in-label'),
             dbc.Button("Log Out", id='log-out')
-        ]
+        ], 
+        style={'text-align': 'center'}
     )
 
 
@@ -83,6 +89,7 @@ def toggle_password_visibility(checked):
 )
 def check_login(login_click, username, password):
     if login_click:
+        # time.sleep(1)
         if not username or not password:
             return 'user credentials not entered'
         

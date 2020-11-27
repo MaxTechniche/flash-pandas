@@ -6,12 +6,18 @@ import dash_html_components as html
 from dash.dependencies import Output, State, Input
 from flask import session
 
-from flashpandas.app import APP, users, questions
+from flashpandas.app import APP, users, cards
 
 layout = \
-    dbc.Row(
+    html.Div([
+        html.Div("Create Account", style={'text-align': 'center', 'font-size': '20px'}),
         dbc.Col(
             [
+                # dbc.Label('Email: needed to reset password', id='email-label'),
+                # dbc.Input(
+                #     id='email-entry',
+                #     style={'max-width': '250px', 'margin-bottom': '20px'}
+                # ),
                 dbc.Label('Username: 6-30 characters'),
                 dbc.Input(
                     id='username-signup-entry',
@@ -39,7 +45,7 @@ layout = \
                     style={'margin-left': '10px'}
                 )
             ]
-        ),
+        ),],
         style={'text-alignment': 'center'}
     )
 

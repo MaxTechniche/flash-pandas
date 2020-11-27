@@ -3,11 +3,10 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Output, State, Input
 
-from flashpandas.app import APP, users, questions
-# from flashpandas.dbmodels import DB
+from flashpandas.app import APP, users, cards
 
 
-layout = 'learn'
+layout = html.Div('Learn coming later', style={'text-align': 'center'})
 
 
 # html.Div(

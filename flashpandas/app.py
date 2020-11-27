@@ -1,13 +1,9 @@
-from os import getenv
-
+import time
 import dash
 import dash_bootstrap_components as dbc
+from flask_pymongo import PyMongo
+from os import getenv
 
-from .dbmodels import DB
-from pymongo import MongoClient
-
-
-# def create_APP():
 APP = dash.Dash(__name__, 
     external_stylesheets=[
         dbc.themes.LUMEN, 
@@ -17,24 +13,40 @@ APP = dash.Dash(__name__,
 
 APP.title = 'Flash Pandas'
 
-# SQLAlchemy
 APP.server.config.suppress_callback_exceptions = True
-# APP.server.config["SQLALCHEMY_DATABASE_URI"] = 
-# APP.server.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-# MongoAlchemy 
-# APP.server.config['MONGOALCHEMY_SERVER_AUTH'] = False
-
-mongo_db = getenv('MONGO_DB_URI')
-
 APP.server.secret_key = getenv('SECRET_KEY')
-
+mongo_db = getenv('MONGO_DB_URI')
 APP.server.config['MONGO_URI'] = mongo_db
 
-DB.init_app(APP.server)
+DB = PyMongo(APP.server)
+
+# DB.init_app(APP.server)
 
 users = DB.db.users
-questions = DB.db.questions
+cards = DB.db.cards
 
 
     # return APP
+# MODELS
+class Question:
+    def __init__(self, q_text, a_text, summary=None, tags=[], q_images=[], a_images=[], contributors=[]) -> None:
+        self.q_text = q_text
+        self.a_text = a_text
+        self.summary = summary
+        self.tags = tags
+        self.q_images = q_images
+        self.a_images = a_images
+        self.contributors = contributors
+        self.time_of_creation = time.time()
+
+    def to_json(self):
+        j = {
+            'summary': self.summary,
+            'question_text': self.q_text,
+            'question_image_links': self.q_images,
+            'answer_text': self.a_text,
+            'answer_image_links': self.a_images,
+            'contributors': self.contributors,
+            'tags': self.tags,
+            'creation_time': self.time_of_creation
+        }
