@@ -2,6 +2,8 @@ import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Output, State, Input
+from pymongo.errors import DuplicateKeyError
+from flask import session
 
 from flashpandas.app import APP, users, cards, Card
 
@@ -17,7 +19,7 @@ header = html.Div(
 
 question_and_answer = dbc.Row([
     dbc.Col([
-        dbc.Label('Question Input'),
+        dbc.Label(children=['Question Input (uses ', html.A('Markdown', href='https://www.markdownguide.org/', target='_blank'), ')']),
         dbc.Textarea(
             id='question-input', 
             persistence=True, 
@@ -26,9 +28,9 @@ question_and_answer = dbc.Row([
         dbc.Label('Question View'),
         dcc.Markdown(id='question-view', style={'border': '2px solid #C8E4F4', 'border-radius': '3px', 'padding': '5px', 'margin-bottom': '15px'}),
         dcc.Markdown('---')
-    ], style={'min-width': '200px'}),
+    ], style={'min-width': '250px'}),
     dbc.Col([
-        dbc.Label('Answer Input'),
+        dbc.Label(children=['Answer Input (uses ', html.A('Markdown', href='https://www.markdownguide.org/', target='_blank'), ')']),
         dbc.Textarea(
             id='answer-input',
             persistence=True, 
@@ -37,7 +39,7 @@ question_and_answer = dbc.Row([
         dbc.Label('Answer View'),
         dcc.Markdown(id='answer-view', style={'border': '2px solid #C8E4F4', 'border-radius': '3px', 'padding': '5px', 'margin-bottom': '15px'}),
         dcc.Markdown('---')
-    ], style={'min-width': '200px'})
+    ], style={'min-width': '250px'})
 ])
 
 tags_and_title = dbc.Row(
@@ -68,7 +70,7 @@ public_and_submit = html.Div(
                     id='public-check', 
                     persistence=True, 
                     persistence_type='local',),
-                dbc.Label("Make Public", style={'padding-left': '5px'}),
+                dbc.Label('Make Public', style={'padding-left': '5px'}),
             ],
         ),
         dbc.Col([
@@ -77,7 +79,8 @@ public_and_submit = html.Div(
                 id='card-submit',
                 color='success'
             ),
-            dbc.Label(id='error-info')
+            html.Div(),
+            dbc.Label(id='error-info', style={'padding-top': '10px'})
         ])
     ], style={'text-align': 'center'}
 )
@@ -92,17 +95,6 @@ layout = html.Div(
     ], id='create-layout',
 )
 
-@APP.callback(
-    Output('error-info', 'children'),
-    Input('card-submit', 'click'),
-    [State('question-text', 'value'),
-    State('answer-text', 'value'),
-    State('tags-input', 'value'),
-    State('title-input', 'value'),
-    State('public-check', 'checked')])
-async def submit_card(n_clicks, q_text, a_text, tags, title, public):
-    return 'Puppies'
-
 
 @APP.callback(
     [Output('question-view', 'children'),
@@ -112,3 +104,37 @@ async def submit_card(n_clicks, q_text, a_text, tags, title, public):
 def mirror_text(question, answer):
     return [question, answer]
 
+
+@APP.callback(
+    Output('error-info', 'children'),
+    Input('card-submit', 'n_clicks'),
+    [State('question-input', 'value'),
+    State('answer-input', 'value'),
+    State('tags-input', 'value'),
+    State('title-input', 'value'),
+    State('public-check', 'checked')])
+def submit_card(n_clicks, q_input, a_input, tags, title, public):
+    if n_clicks:
+        if not q_input:
+            return 'No question provided'
+        if not a_input:
+            return 'No answer provided'
+        
+        card = Card(
+            title=title,
+            q_text=q_input,
+            a_text=a_input,
+            tags=tags,
+            public=public,
+            contributor=session.get('username', None),
+        )
+
+        try:
+            cards.insert_one(card.to_json())
+        except DuplicateKeyError:
+            return 'Title already used'
+
+        return dcc.Location('url', '/profile')
+
+    return ''
+    

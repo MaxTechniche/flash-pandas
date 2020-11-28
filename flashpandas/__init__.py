@@ -46,29 +46,29 @@ page = html.Div(id='page-content', style={'margin': '1rem'})
 footer = \
     dbc.Col(
         [
-            "Built by Jacob Maxfield with Dash.",
+            'Built by Jacob Maxfield with Dash.',
             html.Div(
                 [
                     html.A(
                         dbc.Button(
-                            "YouTube",
+                            'YouTube',
                             id='youtube',
                             color='danger',
                             outline=True,
                             size='sm'
                         ),
-                        href="https://youtube.com/MaxTechniche",
+                        href='https://youtube.com/MaxTechniche',
                         style={'margin': '1%'}
                     ),
                     html.A(
                         dbc.Button(
-                            "GitHub",
+                            'GitHub',
                             id='github',
                             color='dark',
                             outline=True,
                             size='sm'
                         ),
-                        href="https://github.com/MaxTechniche",
+                        href='https://github.com/MaxTechniche',
                         style={'margin': '1%'}
                     ),
                 ],

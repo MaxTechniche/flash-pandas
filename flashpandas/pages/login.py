@@ -15,7 +15,7 @@ url = dcc.Location(id='url', pathname='/login')
 
 logged_out_layout = \
     html.Div([
-        html.Div("Login", style={'text-align': 'center', 'font-size': '20px'}),
+        html.Div('Login', style={'text-align': 'center', 'font-size': '20px'}),
         dbc.Col(
             [
                 dbc.Label('Username', id='user-label'),
@@ -35,7 +35,7 @@ logged_out_layout = \
                 dbc.Label('Show Password', style={'margin-left': '5px'}),
                 html.Div(),
                 dbc.Button(
-                    "Login",
+                    'Login',
                     id='login-button',
                     color='success'
                 ),
@@ -53,8 +53,8 @@ logged_out_layout = \
 logged_in_layout = \
     html.Div(
         [
-            dbc.Label("Already logged in", id='logged-in-label'),
-            dbc.Button("Log Out", id='log-out')
+            dbc.Label('Already logged in', id='logged-in-label'),
+            dbc.Button('Log Out', id='log-out')
         ], 
         style={'text-align': 'center'}
     )

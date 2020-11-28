@@ -12,7 +12,7 @@ from flashpandas.app import APP, users, cards
 
 layout = \
     html.Div([
-        html.Div("Create Account", style={'text-align': 'center', 'font-size': '20px'}),
+        html.Div('Create Account', style={'text-align': 'center', 'font-size': '20px'}),
         dbc.Col(
             [
                 html.Form([
@@ -39,7 +39,7 @@ layout = \
                 dbc.Label('Show Password', style={'margin-left': '5px'}),
                 html.Div(),
                 dbc.Button(
-                    "Create Account",
+                    'Create Account',
                     id='signup-button',
                     color='success'
                 ),

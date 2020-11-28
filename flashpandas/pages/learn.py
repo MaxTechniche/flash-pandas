@@ -12,14 +12,14 @@ layout = html.Div('Learn coming later', style={'text-align': 'center'})
 # html.Div(
 #     [
 #         dcc.Markdown(
-#             children="Enter name to add",
-#             id="markdown"
+#             children='Enter name to add',
+#             id='markdown'
 #         ),
 #         dbc.Input(
 #             id='name',
 #         ),
 #         dbc.Button(
-#             "add",
+#             'add',
 #             id='add',
 #         )
 #     ]
@@ -35,12 +35,12 @@ layout = html.Div('Learn coming later', style={'text-align': 'center'})
 #         if name_value:
 #             if users.find({'faves.color':'blue'}):
 #                 print(users.find_one({'Name':name_value}))
-#                 return f"{name_value} already in the database"
+#                 return f'{name_value} already in the database'
 #             else:
 #                 users.insert_one({'Name':name_value, 'faves': {'color': 'blue'}})
-#                 return f"Added {name_value}"
+#                 return f'Added {name_value}'
 #         else:
-#             return "no name entered"
+#             return 'no name entered'
 #     else:
 #         return 'Enter name to add'
 
