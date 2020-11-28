@@ -30,10 +30,10 @@ cards = DB.db.cards
     # return APP
 # MODELS
 class Card:
-    def __init__(self, q_text, a_text, summary=None, tags=[], q_images=[], a_images=[], contributors=[]) -> None:
+    def __init__(self, q_text, a_text, title=None, tags=[], q_images=[], a_images=[], contributors=[]) -> None:
         self.q_text = q_text
         self.a_text = a_text
-        self.summary = summary
+        self.title = title
         self.tags = tags
         self.q_images = q_images
         self.a_images = a_images
@@ -41,7 +41,7 @@ class Card:
 
     def to_json(self):
         return {
-            'summary': self.summary,
+            'title': self.title,
             'question_text': self.q_text,
             'question_image_links': self.q_images,
             'answer_text': self.a_text,

@@ -8,7 +8,14 @@ from flashpandas.app import APP, users, cards, Card
 logged_out_layout = html.Div(['Must be logged in in order to create.', dbc.NavLink(dbc.Button('Login'), href='/login')], style={'text-align': 'center'})
 
 
-card = dbc.Row([
+header = html.Div(
+    [
+        dbc.Label('Card Creation', style={'font-size': '20px', 'margin-bottom':  '0px'}),
+        dcc.Markdown('---'),
+    ], style={'text-align': 'center'}
+)
+
+question_and_answer = dbc.Row([
     dbc.Col([
         dbc.Label('Question Input'),
         dbc.Textarea(
@@ -17,7 +24,7 @@ card = dbc.Row([
             persistence_type='local',
             style={'margin-bottom': '15px'}),
         dbc.Label('Question View'),
-        dcc.Markdown(id='question-text', style={'border': '2px solid #C8E4F4', 'border-radius': '3px', 'padding': '5px', 'margin-bottom': '15px'}),
+        dcc.Markdown(id='question-view', style={'border': '2px solid #C8E4F4', 'border-radius': '3px', 'padding': '5px', 'margin-bottom': '15px'}),
         dcc.Markdown('---')
     ], style={'min-width': '200px'}),
     dbc.Col([
@@ -28,32 +35,80 @@ card = dbc.Row([
             persistence_type='local',
             style={'margin-bottom': '15px'}),
         dbc.Label('Answer View'),
-        dcc.Markdown(id='answer-text', style={'border': '2px solid #C8E4F4', 'border-radius': '3px', 'padding': '5px', 'margin-bottom': '15px'}),
+        dcc.Markdown(id='answer-view', style={'border': '2px solid #C8E4F4', 'border-radius': '3px', 'padding': '5px', 'margin-bottom': '15px'}),
         dcc.Markdown('---')
     ], style={'min-width': '200px'})
 ])
 
+tags_and_title = dbc.Row(
+    [
+        dbc.Col([
+            dbc.Label('Categories (comma separated)'),
+            dbc.Input(
+                id='tags-input', 
+                persistence=True, 
+                persistence_type='local',)
+        ], style={'min-width': '200px'}),
+        dbc.Col([
+            dbc.Label('Title or Summary'),
+            dbc.Input(
+                id='title-input', 
+                persistence=True, 
+                persistence_type='local',)
+        ], style={'min-width': '200px'})
+    ]
+)
+
+public_and_submit = html.Div(
+    [
+        dcc.Markdown('---'),
+        html.Div(
+            [
+                dbc.Checkbox(
+                    id='public-check', 
+                    persistence=True, 
+                    persistence_type='local',),
+                dbc.Label("Make Public", style={'padding-left': '5px'}),
+            ],
+        ),
+        dbc.Col([
+            dbc.Button(
+                'Submit Card',
+                id='card-submit',
+                color='success'
+            ),
+            dbc.Label(id='error-info')
+        ])
+    ], style={'text-align': 'center'}
+)
 
 
 layout = html.Div(
     children=[
-        dbc.Label('Card Creation', style={'font-size': '20px', 'margin-bottom':  '0px'}),
-        dcc.Markdown('---'),
-        card,
-        dbc.Button(
-            "Submit Card",
-            id='card-submit',
-            color='success'
-        ),
-    ],
-    id='create-layout',
-    style={'text-align': 'center'}
+        header,
+        question_and_answer,
+        tags_and_title,
+        public_and_submit,
+    ], id='create-layout',
 )
 
 @APP.callback(
-    [Output('question-text', 'children'),
-    Output('answer-text', 'children')],
+    Output('error-info', 'children'),
+    Input('card-submit', 'click'),
+    [State('question-text', 'value'),
+    State('answer-text', 'value'),
+    State('tags-input', 'value'),
+    State('title-input', 'value'),
+    State('public-check', 'checked')])
+async def submit_card(n_clicks, q_text, a_text, tags, title, public):
+    return 'Puppies'
+
+
+@APP.callback(
+    [Output('question-view', 'children'),
+    Output('answer-view', 'children')],
     [Input('question-input', 'value'),
     Input('answer-input', 'value')])
 def mirror_text(question, answer):
     return [question, answer]
+
