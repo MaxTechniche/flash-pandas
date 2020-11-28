@@ -6,15 +6,8 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-pandas = "*"
-numpy = "*"
-sklearn = "*"
-psycopg2-binary = "*"
-psycopg2 = "*"
 Flask = "*"
-Flask-SQLAlchemy = "*"
 gunicorn = "*"
-jinja2 = "*"
 dash = "*"
 dash-core-components = "*"
 dash-bootstrap-components = "*"
@@ -24,6 +17,7 @@ flask-pymongo = "*"
 bson = "*"
 python-dotenv = "*"
 bcrypt = "*"
+jinja2 = "*"
 
 [requires]
 python_version = "3.8"

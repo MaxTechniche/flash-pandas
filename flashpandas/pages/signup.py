@@ -1,4 +1,5 @@
 import time
+import datetime
 from bcrypt import hashpw, gensalt
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
@@ -6,6 +7,7 @@ import dash_html_components as html
 from dash.dependencies import Output, State, Input
 from flask import session
 
+from pymongo.errors import DuplicateKeyError
 from flashpandas.app import APP, users, cards
 
 layout = \
@@ -13,6 +15,8 @@ layout = \
         html.Div("Create Account", style={'text-align': 'center', 'font-size': '20px'}),
         dbc.Col(
             [
+                html.Form([
+
                 # dbc.Label('Email: needed to reset password', id='email-label'),
                 # dbc.Input(
                 #     id='email-entry',
@@ -44,6 +48,7 @@ layout = \
                     id='info-signup-label',
                     style={'margin-left': '10px'}
                 )
+                ])
             ]
         ),],
         style={'text-alignment': 'center'}
@@ -83,17 +88,16 @@ def check_signup(n_clicks, username, password):
         if len(password) < 6:
             return 'Password too short'
 
-        user_info = users.find_one({'username': username})
-
-        if user_info:
-            return "Username already in use"
-
-        time_of_creation = time.time()
-        time.sleep(1)
-        session['username'] = username
-        users.insert_one({
-            'username': username, 
-            'password': hashpw(bytes(password, 'utf-8'), gensalt()), 
-            'creation': time_of_creation})
+        time_of_creation = datetime.datetime.utcnow()
+        try:
+            users.insert_one({
+                'username': username, 
+                'password': hashpw(bytes(password, 'utf-8'), gensalt()), 
+                'creation': time_of_creation
+                })
+            session['username'] = username
+        except DuplicateKeyError:
+            return 'Username already in use'
+        
         return dcc.Location('url', '/')
     return ''

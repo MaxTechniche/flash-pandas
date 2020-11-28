@@ -1,4 +1,5 @@
 import time
+import datetime
 import dash
 import dash_bootstrap_components as dbc
 from flask_pymongo import PyMongo
@@ -28,7 +29,7 @@ cards = DB.db.cards
 
     # return APP
 # MODELS
-class Question:
+class Card:
     def __init__(self, q_text, a_text, summary=None, tags=[], q_images=[], a_images=[], contributors=[]) -> None:
         self.q_text = q_text
         self.a_text = a_text
@@ -37,10 +38,9 @@ class Question:
         self.q_images = q_images
         self.a_images = a_images
         self.contributors = contributors
-        self.time_of_creation = time.time()
 
     def to_json(self):
-        j = {
+        return {
             'summary': self.summary,
             'question_text': self.q_text,
             'question_image_links': self.q_images,
@@ -48,5 +48,5 @@ class Question:
             'answer_image_links': self.a_images,
             'contributors': self.contributors,
             'tags': self.tags,
-            'creation_time': self.time_of_creation
+            'creation_time': datetime.datetime.utcnow()
         }
