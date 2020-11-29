@@ -32,7 +32,10 @@ logged_out_layout = \
                 dbc.Checkbox(
                     id='pass-toggle'
                 ),
-                dbc.Label('Show Password', style={'margin-left': '5px'}),
+                dbc.Label(
+                    'Show Password', 
+                    style={'margin-left': '5px'}
+                ),
                 html.Div(),
                 dbc.Button(
                     'Login',

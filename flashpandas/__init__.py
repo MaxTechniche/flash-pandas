@@ -24,7 +24,7 @@ url = dcc.Location(id='url')
 navbar = dbc.NavbarSimple(
     children=[
         dbc.NavLink('Learn', href='/learn'),
-        dbc.NavLink('Test', href='/test'),
+        # dbc.NavLink('Test', href='/test'),
         dbc.NavLink('Create', href='/create', disabled=True, id='create-link'),
         dbc.DropdownMenu(
             children=[

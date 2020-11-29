@@ -29,6 +29,7 @@ delete_form = dbc.Col(
             id='private-cards-option',
             style={'padding-bottom': '15px'}
         ),
+        # dbc.Checkbox(),
         dbc.Button('Delete Account', id='delete-button', color='danger')
     ], style={'text-align': 'center', 'padding-top': '30px'}
 )
@@ -53,9 +54,9 @@ def delete_account(n_clicks, value, private_option):
             if session['username'] == value:
                 time.sleep(3)
                 if private_option == 'delete':
-                    cards.delete_many({'contributor': session['username'], 'public': False})
+                    cards.delete_many({'creator': session['username'], 'public': False})
                 elif private_option == 'public':
-                    cards.update_many({'contributor': session['username']}, {'$set': {'public': True}})
+                    cards.update_many({'creator': session['username']}, {'$set': {'public': True}})
                 users.delete_one({'username': value})
                 session.pop('username', None)
                 return [dcc.Location('url', '/')]

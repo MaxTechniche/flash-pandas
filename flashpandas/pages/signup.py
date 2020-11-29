@@ -88,13 +88,12 @@ def check_signup(n_clicks, username, password):
         if len(password) < 6:
             return 'Password too short'
 
-        time_of_creation = datetime.datetime.utcnow()
         try:
             users.insert_one({
                 'username': username, 
-                'password': hashpw(bytes(password, 'utf-8'), gensalt()), 
-                'creation': time_of_creation
-                })
+                'password': hashpw(bytes(password, 'utf-8'), gensalt()),
+                'creation_time': datetime.datetime.utcnow()
+            })
             session['username'] = username
         except DuplicateKeyError:
             return 'Username already in use'

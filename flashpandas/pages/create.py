@@ -17,25 +17,32 @@ header = html.Div(
     ], style={'text-align': 'center'}
 )
 
-question_and_answer = dbc.Row([
+question_and_answer_input = dbc.Row([
     dbc.Col([
         dbc.Label(children=['Question Input (uses ', html.A('Markdown', href='https://www.markdownguide.org/', target='_blank'), ')']),
         dbc.Textarea(
             id='question-input', 
             persistence=True, 
-            persistence_type='local',
-            style={'margin-bottom': '15px'}),
-        dbc.Label('Question View'),
-        dcc.Markdown(id='question-view', style={'border': '2px solid #C8E4F4', 'border-radius': '3px', 'padding': '5px', 'margin-bottom': '15px'}),
-        dcc.Markdown('---')
+            persistence_type='session',
+            style={'margin-bottom': '15px'})
     ], style={'min-width': '250px'}),
     dbc.Col([
         dbc.Label(children=['Answer Input (uses ', html.A('Markdown', href='https://www.markdownguide.org/', target='_blank'), ')']),
         dbc.Textarea(
             id='answer-input',
             persistence=True, 
-            persistence_type='local',
-            style={'margin-bottom': '15px'}),
+            persistence_type='session',
+            style={'margin-bottom': '15px'})
+    ], style={'min-width': '250px'})
+])
+
+question_and_answer_view = dbc.Row([
+    dbc.Col([
+        dbc.Label('Question View'),
+        dcc.Markdown(id='question-view', style={'border': '2px solid #C8E4F4', 'border-radius': '3px', 'padding': '5px', 'margin-bottom': '15px'}),
+        dcc.Markdown('---')
+    ], style={'min-width': '250px'}),
+    dbc.Col([
         dbc.Label('Answer View'),
         dcc.Markdown(id='answer-view', style={'border': '2px solid #C8E4F4', 'border-radius': '3px', 'padding': '5px', 'margin-bottom': '15px'}),
         dcc.Markdown('---')
@@ -45,18 +52,18 @@ question_and_answer = dbc.Row([
 tags_and_title = dbc.Row(
     [
         dbc.Col([
-            dbc.Label('Categories (comma separated)'),
+            dbc.Label('Tags (future goal) (comma separated)'),
             dbc.Input(
                 id='tags-input', 
                 persistence=True, 
-                persistence_type='local',)
+                persistence_type='session',)
         ], style={'min-width': '200px'}),
         dbc.Col([
             dbc.Label('Title or Summary'),
             dbc.Input(
                 id='title-input', 
                 persistence=True, 
-                persistence_type='local',)
+                persistence_type='session',)
         ], style={'min-width': '200px'})
     ]
 )
@@ -69,7 +76,7 @@ public_and_submit = html.Div(
                 dbc.Checkbox(
                     id='public-check', 
                     persistence=True, 
-                    persistence_type='local',),
+                    persistence_type='session',),
                 dbc.Label('Make Public', style={'padding-left': '5px'}),
             ],
         ),
@@ -89,7 +96,8 @@ public_and_submit = html.Div(
 layout = html.Div(
     children=[
         header,
-        question_and_answer,
+        question_and_answer_input,
+        question_and_answer_view,
         tags_and_title,
         public_and_submit,
     ], id='create-layout',
@@ -126,13 +134,10 @@ def submit_card(n_clicks, q_input, a_input, tags, title, public):
             a_text=a_input,
             tags=tags,
             public=public,
-            contributor=session.get('username', None),
+            creator=session.get('username', None),
         )
 
-        try:
-            cards.insert_one(card.to_json())
-        except DuplicateKeyError:
-            return 'Title already used'
+        cards.insert_one(card.to_json())
 
         return dcc.Location('url', '/profile')
 
