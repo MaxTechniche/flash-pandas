@@ -25,6 +25,7 @@ DB = PyMongo(APP.server)
 
 users = DB.db.users
 cards = DB.db.cards
+comments = DB.db.comments
 
 
     # return APP
