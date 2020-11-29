@@ -27,9 +27,19 @@ card_flag_btns = []
 layout = html.Div(
     [
         dbc.Row([
-            dbc.Button('Refresh', id='get-cards'),
-            dbc.Input(id='card-id', placeholder='Card ID', className='ml-auto', style={'max-width': '250px'}),
-            dbc.Button('Report Card', id='report-card')
+            dbc.Button('Refresh Cards', id='get-cards', style={'margin': 'auto'}),
+            dbc.Row([
+                dbc.Row([
+                    dbc.Checkbox(id='show-user-cards', checked=True, style={'margin-top': '5px', 'margin-right': '5px'}),
+                    dbc.Label('My cards')
+                ], style={'margin-left': '10px', 'margin-right': '10px',}),
+                dbc.Row([
+                    dbc.Checkbox(id='show-public-cards', checked=True, style={'margin-top': '5px', 'margin-right': '5px'}),
+                    dbc.Label('Public cards')
+                ], style={'margin-left': '10px', 'margin-right': '10px'}),
+            ], style={'margin': 'auto'}),
+            dbc.Input(id='card-id', placeholder='Card ID', style={'margin': 'auto', 'width': '200px'}),
+            dbc.Button('Report Card', id='report-card', style={'margin': 'auto'})
         ]),
         html.Div(id='card-list', style={'margin-top': '15px'}),
         # modal
