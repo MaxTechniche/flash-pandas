@@ -18,7 +18,7 @@ logged_out_layout = \
         html.Div('Login', style={'text-align': 'center', 'font-size': '20px'}),
         dbc.Col(
             [
-                dbc.Label('Username', id='user-label'),
+                dbc.Label('Username or Email'),
                 dbc.Input(
                     id='username-entry',
                     style={'max-width': '250px', 'margin-bottom': '20px'}
@@ -96,7 +96,7 @@ def check_login(login_click, username, password):
         if not username or not password:
             return 'user credentials not entered'
         
-        user_info = users.find_one({'username': username})
+        user_info = users.find_one({'username': username}) or users.find_one({'email': username})
 
         if not user_info:
             return 'User not found'
@@ -104,6 +104,6 @@ def check_login(login_click, username, password):
         if not checkpw(bytes(password, 'utf-8'), user_info['password']):
             return 'username or password incorrect'
 
-        session['username'] = username
-        return dcc.Location(pathname='/', id='login-successful')
+        session['username'] = user_info['username']
+        return dcc.Location('url', '/profile')
     return ''

@@ -23,7 +23,7 @@ url = dcc.Location(id='url')
 
 navbar = dbc.NavbarSimple(
     children=[
-        dbc.NavLink('Learn', href='/learn'),
+        dbc.NavLink('Cards', href='/cards'),
         # dbc.NavLink('Test', href='/test'),
         dbc.NavLink('Create', href='/create', disabled=True, id='create-link'),
         dbc.DropdownMenu(
@@ -34,10 +34,13 @@ navbar = dbc.NavbarSimple(
             id='account-dropdown', 
             label='Account', 
             nav=True,
+            style={'margin-right': '20px'}
         )
     ],
     brand='Flash-Pandas',
     brand_href='/',
+    sticky='top', 
+    style={'margin': '0px', 'margin-left': '20px', 'margin-right': '20px'}
 )
 
 
@@ -125,6 +128,9 @@ def display_page(pathname):
             n_layout = [create.logged_out_layout]
         else:
             n_layout = [create.layout]
+
+    if pathname == '/cards':
+        n_layout = [learn.layout]
 
     if not n_layout:
         try:

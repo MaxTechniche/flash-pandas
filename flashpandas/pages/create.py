@@ -23,7 +23,7 @@ question_and_answer_input = dbc.Row([
         dbc.Textarea(
             id='question-input', 
             persistence=True, 
-            persistence_type='session',
+            persistence_type='memory',
             style={'margin-bottom': '15px'})
     ], style={'min-width': '250px'}),
     dbc.Col([
@@ -31,7 +31,7 @@ question_and_answer_input = dbc.Row([
         dbc.Textarea(
             id='answer-input',
             persistence=True, 
-            persistence_type='session',
+            persistence_type='memory',
             style={'margin-bottom': '15px'})
     ], style={'min-width': '250px'})
 ])
@@ -56,14 +56,14 @@ tags_and_title = dbc.Row(
             dbc.Input(
                 id='tags-input', 
                 persistence=True, 
-                persistence_type='session',)
+                persistence_type='memory',)
         ], style={'min-width': '200px'}),
         dbc.Col([
             dbc.Label('Title or Summary'),
             dbc.Input(
                 id='title-input', 
                 persistence=True, 
-                persistence_type='session',)
+                persistence_type='memory',)
         ], style={'min-width': '200px'})
     ]
 )
@@ -75,8 +75,9 @@ public_and_submit = html.Div(
             [
                 dbc.Checkbox(
                     id='public-check', 
-                    persistence=True, 
-                    persistence_type='session',),
+                    persistence=True,
+                    checked=False, 
+                    persistence_type='memory',),
                 dbc.Label('Make Public', style={'padding-left': '5px'}),
             ],
         ),
@@ -129,17 +130,17 @@ def submit_card(n_clicks, q_input, a_input, tags, title, public):
             return 'No answer provided'
         
         card = Card(
-            title=title,
+            title=title or '',
             q_text=q_input,
             a_text=a_input,
-            tags=tags,
-            public=public,
+            tags=tags.strip().split(',') if tags else [],
+            public=public or False,
             creator=session.get('username', None),
         )
 
         cards.insert_one(card.to_json())
 
-        return dcc.Location('url', '/profile')
+        return dcc.Location('url', '/cards')
 
     return ''
     

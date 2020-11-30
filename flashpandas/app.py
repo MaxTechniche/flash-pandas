@@ -5,11 +5,17 @@ import dash_bootstrap_components as dbc
 from flask_pymongo import PyMongo
 from os import getenv
 
+
+meta_tags=[
+    {'name': 'viewport', 'content': 'width=device-width, initial-scale=1'}
+]
+
 APP = dash.Dash(__name__, 
     external_stylesheets=[
         dbc.themes.LUMEN, 
         'https://use.fontawesome.com/releases/v5.9.0/css/all.css',
     ], 
+    meta_tags=meta_tags
 )
 
 APP.title = 'Flash Pandas'
@@ -48,6 +54,6 @@ class Card:
             'public': self.public,
             'creator': self.creator,
             'flagged': False,
-            'flag_comments': None,
+            'flag_reason': "",
             'creation_time': datetime.datetime.utcnow()
         }

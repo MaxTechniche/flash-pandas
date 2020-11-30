@@ -30,14 +30,17 @@ layout = html.Div(
     [
         dbc.Row([
             dbc.Row([
+                dbc.Button('Refresh', id='get-cards'),
                 dbc.Row([
-                    dbc.Checkbox(id='show-user-cards', checked=True, style={'margin-top': '5px', 'margin-right': '5px'}),
-                    dbc.Label('My cards')
-                ], style={'margin-left': '10px', 'margin-right': '10px', 'margin-top': '7px'}),
-                dbc.Row([
-                    dbc.Checkbox(id='show-public-cards', checked=True, style={'margin-top': '5px', 'margin-right': '5px'}),
-                    dbc.Label('Public cards')
-                ], style={'margin-left': '10px', 'margin-right': '10px', 'margin-top': '7px'}),
+                    dbc.Row([
+                        dbc.Checkbox(id='show-user-cards', checked=True, style={'margin-top': '5px', 'margin-right': '5px'}),
+                        dbc.Label('My cards')
+                    ], style={'margin-left': '30px', 'margin-right': '10px', 'margin-top': '7px'}),
+                    dbc.Row([
+                        dbc.Checkbox(id='show-public-cards', checked=True, style={'margin-top': '5px', 'margin-right': '5px'}),
+                        dbc.Label('Public cards')
+                    ], style={'margin-left': '10px', 'margin-right': '10px', 'margin-top': '7px'}),
+                ])
             ], style={'margin': 'auto', 'text-align': 'center'}),
             dbc.Row([
                 dbc.Button('Report Card', id='report-card'),
@@ -48,19 +51,21 @@ layout = html.Div(
                 ], style={'margin': 'auto'})
             ], style={'margin': 'auto', 'text-align': 'center'})
         ], style={'margin': 'auto', 'text-align': 'center'}),
-        html.Div(id='card-list', style={'margin-top': '15px'}),
+        html.Div('Loading...', id='card-list', style={'margin-top': '15px'}),
+        html.Div(id='test')
         # modal
-    ],
-    id='get-cards',
+    ]
 )
 
 
 @APP.callback(
     Output('card-list', 'children'),
-    [Input('show-user-cards', 'checked'),
-    Input('show-public-cards', 'checked')]
+    [Input('get-cards', 'n_clicks'),
+    Input('show-user-cards', 'checked'),
+    Input('show-public-cards', 'checked'),
+    Input('report-code', 'children')]
 )
-def get_cards(personal, public):
+def get_cards(n_clicks, personal, public, children):
 
     card_list = []
     username = session.get('username', None)
@@ -86,7 +91,7 @@ def get_cards(personal, public):
 
 def fill_card(card):
     try:
-        layout = \
+        card_layout = \
             html.Div(
                 [
                     html.Div(
@@ -109,11 +114,13 @@ def fill_card(card):
                                         }),
                                     dcc.Markdown(
                                         card['question_text'], 
+                                        id=str(card['_id']) + '-question',
                                         style={
                                             'border-radius': '3px', 
                                             'padding': '5px', 
                                             'margin-bottom': '5px', 
-                                            'background-color': '#ccc'
+                                            'background-color': '#ccc',
+                                            # 'filter': 'blur(10px)',
                                         }),
                                 ], style={'min-width': '200px'}
                             ),
@@ -127,6 +134,7 @@ def fill_card(card):
                                         }),
                                     dcc.Markdown(
                                         card['answer_text'], 
+                                        id=str(card['_id']) + '-answer',
                                         style={
                                             'border-radius': '3px', 
                                             'padding': '5px', 
@@ -140,7 +148,7 @@ def fill_card(card):
                     dbc.Row(
                         [
                             dbc.Label(
-                                'Tags: ' + card['tags'] if card['tags'] else '', 
+                                'Tags: ' + ', '.join(card['tags']) if card['tags'] else '', 
                                 className='mr-auto'), 
                             dbc.Label(
                                 'Creator: ' + card['creator'], 
@@ -149,8 +157,10 @@ def fill_card(card):
                     ),
                     html.Div(
                         [
-                            dbc.Label('Flagged: ' + str(card['flagged_reason'] if card['flagged_reason'] else '') if card['flagged'] else '', style={'margin-right': '5px', 'color': 'red'}),
-                            dbc.Label('Card ID: ' + str(card['_id']), style={'font-size': '12px'}),
+                            dbc.Label('Flagged: ' + card['flag_reason'] if card['flagged'] else '', 
+                                style={'margin-right': '5px', 'color': 'red'}),
+                            dbc.Label('Card ID: ' + str(card['_id']), 
+                                style={'font-size': '12px'}),
                         ], style={'text-align': 'center'}
                     )
                     # Report Button
@@ -170,7 +180,7 @@ def fill_card(card):
     except Exception as e:
         print(e)
         return 'Error with card'
-    return layout
+    return card_layout
 
             
 @APP.callback(
@@ -185,10 +195,18 @@ def report_card(n_clicks, card_id, reason):
             return 'No ID provided'
         try:
             obj_id = ObjectId(card_id)
-        except bson.errors.InvalidId as inv_id:
+        except bson.errors.InvalidId:
             return 'Invalid ID'
-        code = cards.update_one({'_id': obj_id}, {'$set': {'flagged': True, 'flagged_reason': reason}})
-        print(code.matched_count)
+        code = cards.update_one({'_id': obj_id}, {'$set': {'flagged': True, 'flag_reason': reason or 'Unknown', 'public': False}})
+        if code.matched_count:
+            return 'Card Reported'
 
     return ''
 
+# @APP.callback(
+#     Output('{id:s}-question', 'style'),
+#     Input('card-list', 'children')
+# )
+# def cover(card_list, ids):
+#     # pprint(card_list)
+#     return ''

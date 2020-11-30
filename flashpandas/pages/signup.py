@@ -22,9 +22,14 @@ layout = \
                 #     id='email-entry',
                 #     style={'max-width': '250px', 'margin-bottom': '20px'}
                 # ),
-                dbc.Label('Username: 6-30 characters'),
+                dbc.Label('Username (Display Name): 6-30 characters'),
                 dbc.Input(
                     id='username-signup-entry',
+                    style={'max-width': '250px', 'margin-bottom': '20px'}
+                ),
+                dbc.Label('Email:'),
+                dbc.Input(
+                    id='email-signup-entry',
                     style={'max-width': '250px', 'margin-bottom': '20px'}
                 ),
                 dbc.Label('Password: 6-30 characters'),
@@ -68,13 +73,14 @@ def toggle_signup_password_visibility(checked):
 @APP.callback(
     Output('info-signup-label', 'children'),
     Input('signup-button', 'n_clicks'),
-    [State('username-signup-entry', 'value'),
+    [State('email-signup-entry', 'value'),
+    State('username-signup-entry', 'value'),
     State('password-signup-entry', 'value')]
 )
-def check_signup(n_clicks, username, password):
+def check_signup(n_clicks, email, username, password):
     if n_clicks:
-        if not username or not password:
-            return 'user credentials not entered'
+        if not username or not password or not email:
+            return 'Missing some information'
 
         if len(username) > 30:
             return 'Username too long'
@@ -91,12 +97,16 @@ def check_signup(n_clicks, username, password):
         try:
             users.insert_one({
                 'username': username, 
+                'email': email,
                 'password': hashpw(bytes(password, 'utf-8'), gensalt()),
                 'creation_time': datetime.datetime.utcnow()
             })
             session['username'] = username
-        except DuplicateKeyError:
-            return 'Username already in use'
+        except Exception as e:
+            if users.find_one({'username': username}):
+                return 'Username already in use'
+            elif users.find_one({'email': email}):
+                return 'Email already in use'
         
-        return dcc.Location('url', '/')
+        return dcc.Location('url', '/profile')
     return ''

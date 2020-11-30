@@ -14,25 +14,28 @@ user_info = html.Div([
 )
 
 
-delete_form = dbc.Col(
+delete_form = dbc.Row(
     [
-        dbc.Label('Enter username to confirm'),
-        dbc.Input(id='username-input', autoComplete=False, style={'max-width': '250px', 'margin': 'auto'}),
-        dbc.Label(children=[], id='error-code'),
-        html.Div(id='username-display-update'),
-        dbc.RadioItems(
-            options=[
-                {'label': 'Delete private cards (permanent)','value': 'delete'},
-                {'label': 'Make your cards public', 'value': 'public'}
-            ],
-            value='delete',
-            id='private-cards-option',
-            style={'padding-bottom': '15px'}
+        dbc.Col([
+
+            dbc.Label('Enter username to confirm'),
+            dbc.Input(id='username-input', autoComplete=False, style={'max-width': '250px', 'margin': 'auto'}),
+            dbc.Label(children=[], id='error-code'),
+            html.Div(id='username-display-update'),
+            dbc.RadioItems(
+                options=[
+                    {'label': 'Delete private cards (permanent)','value': 'delete'},
+                    {'label': 'Make your cards public', 'value': 'public'}
+                ],
+                value='delete',
+                id='private-cards-option',
+                style={'padding-bottom': '15px'}
+            ),
+            # dbc.Checkbox(),
+            dbc.Button('Delete Account', id='delete-button', color='danger', size='sm')
+            ], style={'text-align': 'center', 'padding': '10px', 'border': '1px solid red', 'border-radius': '3px', 'margin': '0px'}
         ),
-        # dbc.Checkbox(),
-        dbc.Button('Delete Account', id='delete-button', color='danger')
-    ], style={'text-align': 'center', 'padding-top': '30px'}
-)
+    ], style={'padding-top': '75px'})
     
 
 layout = html.Div(
@@ -70,4 +73,4 @@ def delete_account(n_clicks, value, private_option):
     Input('username-display-update', 'children')
 )
 def display_user_info(info):
-    return session.get('username', None)
+    return 'Username:  ' + session.get('username', None)
