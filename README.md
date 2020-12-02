@@ -2,15 +2,19 @@
 
 Web app to help people recall and or learn Data Science programming.
 
-
 ## Updates
+
+
+### 2020-12-01
+
+- You can now choose to hide/reveal questions and answers and hover to reveal
 
 ### 2020-11-29
 
 #### New Features
 
 - Renamed 'Learn' tab to 'Cards'
-- User can now login and signup with email (username is your display name)
+- User can now login and sign up with email (username is your display name)
 - Better mobile layout
 - Re-added refresh button on cards page
 

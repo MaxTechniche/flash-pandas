@@ -9,6 +9,13 @@ from pymongo.collection import ObjectId
 from flashpandas.app import APP, users, cards
 from pprint import pprint
 
+qa_style = {
+        'border-radius': '3px', 
+        'padding': '5px', 
+        'margin-bottom': '5px', 
+        'background-color': '#ccc'
+    }
+
 card_flag_btns = []
 
 # modal = dbc.Modal(
@@ -39,6 +46,14 @@ layout = html.Div(
                     dbc.Row([
                         dbc.Checkbox(id='show-public-cards', checked=True, style={'margin-top': '5px', 'margin-right': '5px'}),
                         dbc.Label('Public cards')
+                    ], style={'margin-left': '10px', 'margin-right': '10px', 'margin-top': '7px'}),
+                    dbc.Row([
+                        dbc.Checkbox(id='show-questions', checked=True, style={'margin-top': '5px', 'margin-right': '5px'}),
+                        dbc.Label('Show Questions')
+                    ], style={'margin-left': '30px', 'margin-right': '10px', 'margin-top': '7px'}),
+                    dbc.Row([
+                        dbc.Checkbox(id='show-answers', checked=False, style={'margin-top': '5px', 'margin-right': '5px'}),
+                        dbc.Label('Show Answers')
                     ], style={'margin-left': '10px', 'margin-right': '10px', 'margin-top': '7px'}),
                 ])
             ], style={'margin': 'auto', 'text-align': 'center'}),
@@ -114,14 +129,8 @@ def fill_card(card):
                                         }),
                                     dcc.Markdown(
                                         card['question_text'], 
-                                        id=str(card['_id']) + '-question',
-                                        style={
-                                            'border-radius': '3px', 
-                                            'padding': '5px', 
-                                            'margin-bottom': '5px', 
-                                            'background-color': '#ccc',
-                                            # 'filter': 'blur(10px)',
-                                        }),
+                                        id='question',
+                                        style=qa_style),
                                 ], style={'min-width': '200px'}
                             ),
                             dbc.Col(
@@ -134,13 +143,8 @@ def fill_card(card):
                                         }),
                                     dcc.Markdown(
                                         card['answer_text'], 
-                                        id=str(card['_id']) + '-answer',
-                                        style={
-                                            'border-radius': '3px', 
-                                            'padding': '5px', 
-                                            'margin-bottom': '5px', 
-                                            'background-color': '#ccc'
-                                        }),
+                                        id='answer',
+                                        style=qa_style),
                                 ], style={'min-width': '200px'}
                             )
                         ]
@@ -203,10 +207,24 @@ def report_card(n_clicks, card_id, reason):
 
     return ''
 
-# @APP.callback(
-#     Output('{id:s}-question', 'style'),
-#     Input('card-list', 'children')
-# )
-# def cover(card_list, ids):
-#     # pprint(card_list)
-#     return ''
+@APP.callback(
+    Output('question', 'style'),
+    Input('show-questions', 'checked')
+)
+def show_questions(show):
+    if show:
+        next = qa_style.copy()
+        next.update({'filter': 'opacity(1)'})
+        return next
+    return qa_style
+
+@APP.callback(
+    Output('answer', 'style'),
+    Input('show-answers', 'checked')
+)
+def show_answers(show):
+    if show:
+        next = qa_style.copy()
+        next.update({'filter': 'opacity(1)'})
+        return next
+    return qa_style
