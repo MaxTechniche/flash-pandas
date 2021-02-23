@@ -1,15 +1,15 @@
 #question {
-  filter: blur(10px);
+  filter: opacity(0);
 }
 
 #question:hover {
-  filter: blur(0);
+  filter: opacity(1);
 }
 
 #answer {
-  filter: blur(10px);
+  filter: opacity(0);
 }
 
 #answer:hover {
-  filter: blur(0);
+  filter: opacity(1);
 }

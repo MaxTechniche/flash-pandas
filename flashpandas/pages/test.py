@@ -5,4 +5,4 @@ from dash.dependencies import Output, State, Input
 
 from flashpandas.app import APP, users, cards
 
-layout = html.Div("Testing coming later", style={"text-align": "center"})
+layout = html.Div('Testing coming later', style={'text-align': 'center'})

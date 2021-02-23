@@ -6,11 +6,7 @@ from flashpandas.app import APP
 from flask import session
 
 # url = dcc.Location(id='url', pathname='/signout')
-layout = html.Div(
-    children=[dbc.Label("Signed out.", id="signout-label")],
-    id="re-direct",
-    style={"text-align": "center"},
-)
+layout = html.Div(children=[dbc.Label('Signed out.', id='signout-label')], id='re-direct', style={'text-align': 'center'})
 
 # @APP.callback(Output('rd-direct', 'children'), Input('signout-label', 'children'))
 # def redirect_to_home(children):
