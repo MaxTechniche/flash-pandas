@@ -18,6 +18,7 @@ bson = "*"
 python-dotenv = "*"
 bcrypt = "*"
 jinja2 = "*"
+black = "*"
 
 [requires]
 python_version = "3.8"
