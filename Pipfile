@@ -17,7 +17,7 @@ flask-pymongo = "*"
 bson = "*"
 python-dotenv = "*"
 bcrypt = "*"
-jinja2 = "*"
+jinja2 = ">=2.11.3"
 
 [requires]
 python_version = "3.8"
